@@ -1,0 +1,11 @@
+{
+  "name": "Node.js-MongoDB",
+  "version": "1.0.0",
+  "main": "server.js",
+  "repository": "https://github.com/donato14/Node.js-MongoDB.git",
+  "author": "Kang Kujun <donato14@naver.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
