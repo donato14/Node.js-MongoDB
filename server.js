@@ -5,6 +5,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 let db;
 const MongoClient = require('mongodb').MongoClient;
+app.set('view engine', 'ejs');
+
 MongoClient.connect('', function (err, client) {
   if (err) { return console.log(err) }
   
@@ -46,5 +48,10 @@ app.post('/add', function (req, res) {
 });
 
 app.get('/list', function (req, res) {
-  
-})
+
+  db.collection('post').find().toArray(function (err, result) {
+    console.log(result)
+    res.render('./list.ejs', { posts : result })
+  });
+
+});
