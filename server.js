@@ -3,9 +3,24 @@ const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.listen(8080, function () {
-  console.log('listening on 8080');
-});
+let db;
+const MongoClient = require('mongodb').MongoClient;
+MongoClient.connect('', function (err, client) {
+  if (err) { return console.log(err) }
+  
+  db = client.db('todoapp');
+
+  // db.collection('post').insertOne({이름 : 'John', 나이 : 20, _id : 100}, function (err, res) {
+  //   console.log('저장완료');
+  // });
+
+  app.listen(8080, function () {
+    console.log('listening on 8080');
+  });
+
+  
+})
+
 
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
@@ -25,5 +40,11 @@ app.get('/write', function (req, res) {
 
 app.post('/add', function (req, res) {
   res.send('전송완료');
-  console.log(req.body.title)
+  db.collection('post').insertOne({제목 : req.body.title, 날짜 : req.body.date }, function (err, res) {
+    console.log('저장완료');
+  });
+});
+
+app.get('/list', function (req, res) {
+  
 })
