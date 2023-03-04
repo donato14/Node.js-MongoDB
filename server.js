@@ -3,6 +3,8 @@ const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/public', express.static('public'));
+const methodsOverride = require('method-override');
+app.use(methodsOverride('_method'));
 
 let db;
 const MongoClient = require('mongodb').MongoClient;
@@ -41,6 +43,7 @@ app.get('/write', function (req, res) {
   res.sendFile(__dirname + '/write.html')
 });
 
+
 app.post('/add', function (req, res) {
   let 총게시물갯수 = 0;
   db.collection('counter').findOne({ name: '게시물갯수' }, function (err, result) {
@@ -65,6 +68,14 @@ app.get('/list', function (req, res) {
 
 });
 
+app.get('/edit/:id', function (req, res) {
+
+  db.collection('post').findOne({ _id: parseInt(req.params.id) }, function (err, result) {
+    console.log(result)
+    res.render('edit.ejs', { data: result });
+  });
+});
+
 app.delete('/delete', function (req, res) {
   // console.log(req.body)
   req.body._id = parseInt(req.body._id);
@@ -80,3 +91,10 @@ app.get('/detail/:id', function (req, res) {
     res.render('detail.ejs', { data: result });
   });
 });
+
+
+app.put('/edit', function (req, res) {
+  db.collection('post').updateOne({_id : parseInt(req.body.id)}, { $set: {제목:req.body.title, 날짜:req.body.date}}, function (err, result) {
+    res.redirect('/list')
+  })
+})
