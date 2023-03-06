@@ -118,6 +118,18 @@ app.post('/login', passport.authenticate('local', {
   res.redirect('/')
 });
 
+app.get('/mypage', 로그인했니, function (req, res) {
+  res.render('mypage.ejs', {사용자 : req.user});
+});
+
+function 로그인했니(req, res, next) {
+  if (req.user) {
+    next()
+  } else {
+    res.send('로그인안했음')
+  }
+}
+
 passport.use(new LocalStratgy({
   usernameField: 'id',
   passwordField: 'pw',
@@ -141,5 +153,7 @@ passport.serializeUser(function (user, done) {
   done(null, user.id)
 });
 passport.deserializeUser(function (아이디, done) {
-  done(null, {})
+  db.collection('login').findOne({ id : 아이디 }, function (error, result) {
+    done(null, result)
+  })
 });
