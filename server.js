@@ -10,16 +10,18 @@ let db;
 const MongoClient = require('mongodb').MongoClient;
 app.set('view engine', 'ejs');
 
-MongoClient.connect('', function (err, client) {
+require('dotenv').config();
+
+
+MongoClient.connect(process.env.DB_URL, function (err, client) {
   if (err) { return console.log(err) }
-  
   db = client.db('todoapp');
 
   // db.collection('post').insertOne({이름 : 'John', 나이 : 20, _id : 100}, function (err, res) {
   //   console.log('저장완료');
   // });
 
-  app.listen(8080, function () {
+  app.listen(process.env.PORT, function () {
     console.log('listening on 8080');
   });
 
