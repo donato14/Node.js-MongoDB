@@ -45,22 +45,6 @@ app.get('/write', function (req, res) {
   res.sendFile(__dirname + '/write.html')
 });
 
-
-app.post('/add', function (req, res) {
-  let 총게시물갯수 = 0;
-  db.collection('counter').findOne({ name: '게시물갯수' }, function (err, result) {
-    총게시물갯수 = result.totalPost;
-
-    db.collection('post').insertOne({ _id : 총게시물갯수 + 1, 제목 : req.body.title, 날짜 : req.body.date }, function (err, res) {
-      console.log('저장완료');
-      db.collection('counter').updateOne({ name: '게시물갯수' }, { $inc: { totalPost: 1 } }, function (err, result) {
-        if(err){return console.log(err)}
-      });
-    });
-  });
-  res.send('전송완료');
-});
-
 app.get('/list', function (req, res) {
 
   db.collection('post').find().toArray(function (err, result) {
@@ -76,15 +60,6 @@ app.get('/edit/:id', function (req, res) {
     console.log(result)
     res.render('edit.ejs', { data: result });
   });
-});
-
-app.delete('/delete', function (req, res) {
-  // console.log(req.body)
-  req.body._id = parseInt(req.body._id);
-  db.collection('post').deleteOne(req.body, function (err, result) {
-    console.log('삭제완료');
-    res.status(200).send({message : '성공했습니다'});
-  })
 });
 
 app.get('/detail/:id', function (req, res) {
@@ -183,3 +158,40 @@ app.get('/search', (req, res) => {
   });
 });
 
+app.post('/add', function (req, res) {
+  let 총게시물갯수 = 0;
+  db.collection('counter').findOne({ name: '게시물갯수' }, function (err, result) {
+    총게시물갯수 = result.totalPost;
+
+    let 저장할거 = { _id : 총게시물갯수 + 1, 제목 : req.body.title, 날짜 : req.body.date, 작성자 : req.user._id }
+
+    db.collection('post').insertOne(저장할거, function (err, res) {
+      console.log('저장완료');
+      db.collection('counter').updateOne({ name: '게시물갯수' }, { $inc: { totalPost: 1 } }, function (err, result) {
+        if(err){return console.log(err)}
+      });
+    });
+  });
+  res.send('전송완료');
+});
+
+app.post('/register', (req, res) => {
+  db.collection('login').insertOne({ id: req.body.id, pw: req.body.pw }, function (error, result) {
+    res.redirect('/')
+  });
+});
+
+app.delete('/delete', function (req, res) {
+  // console.log(req.body)
+  req.body._id = parseInt(req.body._id);
+
+  let 삭제할데이터 = {_id : req.body._id, 작성자 : req.user._id}
+
+  db.collection('post').deleteOne(삭제할데이터, function (err, result) {
+    console.log('삭제완료');
+    res.status(200).send({message : '성공했습니다'});
+  })
+});
+
+app.use('/shop', require('./routes/shop.js'));
+app.use('/board/sub', require('./routes/board.js'));
